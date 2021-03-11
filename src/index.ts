@@ -46,8 +46,10 @@ export default class Hook extends HookEvent {
     if (readonlyConfig) {
       this.setReadOnlyProps(setterName, readonlyConfig)
     }
-    const readOnlys = this._getReadonlyCache(setterName)
+
     return (key: setterKey, value?: any) => {
+      const readOnlys = this.getReadonlyProps(setterName)
+
       if (isPlainObject(key)) {
         const config = <config>key
         Object.keys(readOnlys).forEach((prop) => {
@@ -94,7 +96,7 @@ export default class Hook extends HookEvent {
     }
   }
 
-  private _getReadonlyCache(setterName: string) {
+  getReadonlyProps(setterName: string): readonlyConfig {
     const caches = this._readonlyCaches
     if (!caches[setterName]) {
       caches[setterName] = {}
@@ -102,10 +104,10 @@ export default class Hook extends HookEvent {
     return caches[setterName]
   }
 
-  setReadOnlyProps(setterName: string, props = {}) {
-    const cache = this._getReadonlyCache(setterName)
+  setReadOnlyProps(setterName: string, props: readonlyConfig = {}) {
+    const cache = this.getReadonlyProps(setterName)
     Object.keys(props).forEach((key) => {
-      if (cache[key]) {
+      if (props[key]) {
         cache[key] = true
       } else {
         delete cache[key]
