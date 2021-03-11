@@ -1,53 +1,54 @@
 import HookEvent from '@hook/event'
-
 import { merge, isPlainObject } from 'lodash'
-type readonlyConfig = {
+
+export { options } from '@hook/event'
+export type setterKey = string | {[key: string]: any }
+
+type setterReadonlys = {
   [key: string]: boolean
 }
-type readonlyCaches = {
-  [setterName: string]: readonlyConfig
+type readonlySetters = {
+  [setterName: string]: setterReadonlys
 }
 
-type dataCache = {
+type setterData = {
   [key: string]: any
 }
-type dataCaches = {
-  [key: string] : dataCache
+type settersData = {
+  [key: string] : setterData
 }
 
 type config = {
   [setterName: string]: any
 }
 
-export type setterKey = string | {[key: string]: any }
-
 export default class Hook extends HookEvent {
-  private _readonlyCaches: readonlyCaches = {}
-  private _setterCaches: dataCaches= {}
+  private _readonlySetters: readonlySetters = {}
+  private _setterdata: settersData= {}
 
-  private _getSetterCache(setterName: string) {
-    const caches = this._setterCaches
+  private _getSetterData(setterName: string): any {
+    const caches = this._setterdata
     if (!caches[setterName]) {
       caches[setterName] = {}
     }
     return caches[setterName]
   }
 
-  set(key: setterKey, value?: any) {
+  set(key: setterKey, value?: any): this {
     return this.generateSetter('set')(key, value)
   }
 
-  get(field?: string) {
+  get(field?: string): any {
     return this.generateGetter('set')(field)
   }
 
-  generateSetter(setterName: string, readonlyConfig?: readonlyConfig) {
-    const datas: config = this._getSetterCache(setterName)
-    if (readonlyConfig) {
-      this.setReadOnlyProps(setterName, readonlyConfig)
+  generateSetter(setterName: string, setterReadonlys?: setterReadonlys): (key: setterKey, value?: any) => this {
+    const datas: config = this._getSetterData(setterName)
+    if (setterReadonlys) {
+      this.setReadOnlyProps(setterName, setterReadonlys)
     }
 
-    return (key: setterKey, value?: any) => {
+    return (key: setterKey, value?: any): this => {
       const readOnlys = this.getReadonlyProps(setterName)
 
       if (isPlainObject(key)) {
@@ -86,9 +87,9 @@ export default class Hook extends HookEvent {
     }
   }
 
-  generateGetter(setterName: string) {
-    const datas: config = this._getSetterCache(setterName)
-    return (field?: string) => {
+  generateGetter(setterName: string): (field?: string) => any {
+    const datas: config = this._getSetterData(setterName)
+    return (field?: string): any => {
       if (field) {
         return datas[field]
       }
@@ -96,29 +97,21 @@ export default class Hook extends HookEvent {
     }
   }
 
-  getReadonlyProps(setterName: string): readonlyConfig {
-    const caches = this._readonlyCaches
+  getReadonlyProps(setterName: string): setterReadonlys {
+    const caches = this._readonlySetters
     if (!caches[setterName]) {
       caches[setterName] = {}
     }
     return caches[setterName]
   }
 
-  setReadOnlyProps(setterName: string, props: readonlyConfig = {}) {
+  setReadOnlyProps(setterName: string, props: setterReadonlys = {}): this {
     const cache = this.getReadonlyProps(setterName)
     Object.keys(props).forEach((key) => {
       if (props[key]) {
         cache[key] = true
       } else {
         delete cache[key]
-      }
-    })
-    this.emit('HOOK_ERROR', {
-      code: 200001,
-      message: 'add readonly props',
-      detail: {
-        method: setterName,
-        value: props
       }
     })
     return this
