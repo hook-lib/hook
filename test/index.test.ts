@@ -32,8 +32,8 @@ test('add setter and getter', async () => {
 test('getReadonlyProps and setReadonlyProps', () => {
   const hook = new Hook()
   expect(hook.getReadonlyProps('set')).toEqual({})
-  hook.setReadOnlyProps('set', { prop1: true, prop2: true })
+  hook.setReadonlyProps('set', { prop1: true, prop2: true })
   expect(hook.getReadonlyProps('set')).toEqual({ prop1: true, prop2: true })
-  hook.setReadOnlyProps('set', { prop2: false, prop3: true })
+  hook.setReadonlyProps('set', { prop2: false, prop3: true })
   expect(hook.getReadonlyProps('set')).toEqual({ prop1: true, prop3: true })
 })

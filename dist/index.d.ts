@@ -15,5 +15,5 @@ export default class Hook extends HookEvent {
     generateSetter(setterName: string, setterReadonlys?: setterReadonlys): (key: setterKey, value?: any) => this;
     generateGetter(setterName: string): (field?: string) => any;
     getReadonlyProps(setterName: string): setterReadonlys;
-    setReadOnlyProps(setterName: string, props?: setterReadonlys): this;
+    setReadonlyProps(setterName: string, props?: setterReadonlys): this;
 }

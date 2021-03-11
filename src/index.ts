@@ -45,7 +45,7 @@ export default class Hook extends HookEvent {
   generateSetter(setterName: string, setterReadonlys?: setterReadonlys): (key: setterKey, value?: any) => this {
     const datas: config = this._getSetterData(setterName)
     if (setterReadonlys) {
-      this.setReadOnlyProps(setterName, setterReadonlys)
+      this.setReadonlyProps(setterName, setterReadonlys)
     }
 
     return (key: setterKey, value?: any): this => {
@@ -56,13 +56,14 @@ export default class Hook extends HookEvent {
         Object.keys(readOnlys).forEach((prop) => {
           if (typeof config[prop] !== 'undefined') {
             delete config[prop]
-            this.emit('HOOK_ERROR', {
+            this.exception('ERROR', {
               code: 300002,
               message: 'can not set readonly props',
               detail: {
-                method: setterName,
-                prop: prop,
-                value: config[prop]
+                setterName,
+                prop,
+                value: config[prop],
+                config: key
               }
             })
           }
@@ -72,11 +73,11 @@ export default class Hook extends HookEvent {
         if (!readOnlys[key]) {
           datas[key] = value
         } else {
-          this.emit('HOOK_ERROR', {
-            code: 300001,
+          this.exception('ERROR', {
+            code: 300003,
             message: 'can not set readonly prop',
             detail: {
-              method: setterName,
+              setterName,
               prop: key,
               value: value
             }
@@ -105,7 +106,7 @@ export default class Hook extends HookEvent {
     return caches[setterName]
   }
 
-  setReadOnlyProps(setterName: string, props: setterReadonlys = {}): this {
+  setReadonlyProps(setterName: string, props: setterReadonlys = {}): this {
     const cache = this.getReadonlyProps(setterName)
     Object.keys(props).forEach((key) => {
       if (props[key]) {

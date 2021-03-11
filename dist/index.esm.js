@@ -60,7 +60,7 @@ var Hook = /*#__PURE__*/function (_HookEvent) {
       var datas = this._getSetterData(setterName);
 
       if (setterReadonlys) {
-        this.setReadOnlyProps(setterName, setterReadonlys);
+        this.setReadonlyProps(setterName, setterReadonlys);
       }
 
       return function (key, value) {
@@ -72,13 +72,14 @@ var Hook = /*#__PURE__*/function (_HookEvent) {
             if (typeof config[prop] !== 'undefined') {
               delete config[prop];
 
-              _this2.emit('HOOK_ERROR', {
+              _this2.exception('ERROR', {
                 code: 300002,
                 message: 'can not set readonly props',
                 detail: {
-                  method: setterName,
+                  setterName: setterName,
                   prop: prop,
-                  value: config[prop]
+                  value: config[prop],
+                  config: key
                 }
               });
             }
@@ -89,11 +90,11 @@ var Hook = /*#__PURE__*/function (_HookEvent) {
           if (!readOnlys[key]) {
             datas[key] = value;
           } else {
-            _this2.emit('HOOK_ERROR', {
-              code: 300001,
+            _this2.exception('ERROR', {
+              code: 300003,
               message: 'can not set readonly prop',
               detail: {
-                method: setterName,
+                setterName: setterName,
                 prop: key,
                 value: value
               }
@@ -129,8 +130,8 @@ var Hook = /*#__PURE__*/function (_HookEvent) {
       return caches[setterName];
     }
   }, {
-    key: "setReadOnlyProps",
-    value: function setReadOnlyProps(setterName) {
+    key: "setReadonlyProps",
+    value: function setReadonlyProps(setterName) {
       var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var cache = this.getReadonlyProps(setterName);
       Object.keys(props).forEach(function (key) {
