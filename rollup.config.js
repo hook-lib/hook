@@ -26,6 +26,7 @@ export default [
       name: packageName,
       globals: {},
       sourcemap: true,
+      exports: 'default',
     },
     plugins: [
       typescript({
